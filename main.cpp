@@ -129,3 +129,20 @@ public:
     friend void scaleEquation(LinearSystem<U, M>& system,
                               size_t eqIndex, U factor);
 };
+
+template <typename T, size_t N>
+void scaleEquation(LinearSystem<T, N>& system,
+                   size_t eqIndex, T factor) {
+
+    if (eqIndex >= N) {
+        throw out_of_range("Incorrect equation index!");
+    }
+
+    // Умножаем все коэффициенты выбранного уравнения
+    for (size_t j = 0; j < N; j++) {
+        system.A[eqIndex][j] *= factor;
+    }
+
+    // Умножаем свободный член
+    system.B[eqIndex] *= factor;
+}
