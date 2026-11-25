@@ -78,3 +78,54 @@ public:
     friend void scaleEquation(LinearSystem<U, M>& system,
                               size_t eqIndex, U factor);
 };
+
+template <>
+class LinearSystem<double, 3> {
+
+private:
+    double A[3][3];
+    double B[3];
+
+    static inline size_t totalSystemsSolved = 0;
+
+public:
+
+    LinearSystem() {
+        for (int i = 0; i < 3; i++) {
+            B[i] = 0;
+
+            for (int j = 0; j < 3; j++) {
+                A[i][j] = 0;
+            }
+        }
+    }
+
+    double getA(size_t i, size_t j) const {
+        return A[i][j];
+    }
+
+    double getB(size_t i) const {
+        return B[i];
+    }
+
+    void setA(size_t i, size_t j, double value) {
+        A[i][j] = value;
+    }
+
+    void setB(size_t i, double value) {
+        B[i] = value;
+    }
+
+    static void incrementCounter() {
+        totalSystemsSolved++;
+    }
+
+    static size_t getTotalSystemsSolved() {
+        return totalSystemsSolved;
+    }
+
+    // Дружественная функция
+    template <typename U, size_t M>
+    friend void scaleEquation(LinearSystem<U, M>& system,
+                              size_t eqIndex, U factor);
+};
