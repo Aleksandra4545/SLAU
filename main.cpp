@@ -256,3 +256,57 @@ bool solve(LinearSystem<T, N>& system, array<T, N>& x) {
 
     return true;
 }
+
+template <>
+bool solve<double, 3>(
+    LinearSystem<double, 3>& system,
+    array<double, 3>& x) {
+
+    double A[3][3];
+
+    // Копируем матрицу коэффициентов
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            A[i][j] = system.getA(i, j);
+        }
+    }
+
+    double B[3];
+
+    for (int i = 0; i < 3; i++) {
+        B[i] = system.getB(i);
+    }
+
+    // Вычисляем главный определитель
+    double detA = determinant(A);
+
+    const double EPS = 1e-12;
+
+    if (abs(detA) < EPS) {
+        return false;
+    }
+
+    // Вычисляем определители для каждой переменной
+    for (int col = 0; col < 3; col++) {
+
+        double temp[3][3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+
+                if (j == col) {
+                    temp[i][j] = B[i];
+                }
+                else {
+                    temp[i][j] = A[i][j];
+                }
+            }
+        }
+
+        x[col] = determinant(temp) / detA;
+    }
+
+    LinearSystem<double, 3>::incrementCounter();
+
+    return true;
+}
