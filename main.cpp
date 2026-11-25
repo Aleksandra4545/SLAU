@@ -310,3 +310,97 @@ bool solve<double, 3>(
 
     return true;
 }
+
+int main() {
+
+    setlocale(LC_ALL, "Russian");
+
+    ifstream file("systems.txt");
+
+    if (!file.is_open()) {
+        cerr << "Error: cannot open systems.txt\n";
+        return 1;
+    }
+
+    int count;
+    file >> count;
+
+    if (!file || count != 10) {
+        cerr << "Error: file must contain 10 systems\n";
+        return 1;
+    }
+
+    cout << fixed << setprecision(4);
+
+    for (int number = 0; number < count; number++) {
+
+        LinearSystem<double, 3> system;
+
+        // Считываем матрицу A
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+
+                double value;
+                if (!(file >> value)) {
+                    cerr << "Error reading matrix!\n";
+                    return 1;
+                }
+
+                system.setA(i, j, value);
+            }
+        }
+
+        // Считываем вектор B
+        for (int i = 0; i < 3; i++) {
+
+            double value;
+            if (!(file >> value)) {
+                cerr << "Error reading vector!\n";
+                return 1;
+            }
+
+            system.setB(i, value);
+        }
+
+        cout << "\n====================================\n";
+        cout << "SYSTEM #" << number + 1 << "\n";
+        cout << "====================================\n";
+
+        printSystem(system);
+
+        // Демонстрация дружественной функции:
+        // умножаем первое уравнение на 2
+        scaleEquation(system, 0, 2.0);
+
+        cout << "\nAfter scaling the first equation:\n";
+        printSystem(system);
+
+        array<double, 3> solution{};
+
+        // Решение системы
+        if (solve(system, solution)) {
+
+            cout << "\nSolution:\n";
+
+            for (int i = 0; i < 3; i++) {
+                cout << "x" << i + 1 << " = "
+                     << solution[i] << '\n';
+            }
+
+        }
+        else {
+            cout << "\nThe system has no unique solution!\n";
+        }
+    }
+
+    file.close();
+
+    cout << "\n====================================\n";
+    cout << "TOTAL SOLVED SYSTEMS: "
+         << LinearSystem<double, 3>::getTotalSystemsSolved()
+         << '\n';
+
+    cout << "====================================\n";
+
+    return 0;
+}
