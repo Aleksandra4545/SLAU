@@ -181,3 +181,78 @@ double determinant(double a[3][3]) {
                    a[1][1] * a[2][0]);
 }
 
+template <typename T, size_t N>
+bool solve(LinearSystem<T, N>& system, array<T, N>& x) {
+
+    T a[N][N];
+    T b[N];
+
+    // Копируем исходную систему
+    for (size_t i = 0; i < N; i++) {
+
+        b[i] = system.getB(i);
+
+        for (size_t j = 0; j < N; j++) {
+            a[i][j] = system.getA(i, j);
+        }
+    }
+
+    const T EPS = numeric_limits<T>::epsilon() * 100;
+
+    // Прямой ход метода Гаусса
+    for (size_t i = 0; i < N; i++) {
+
+        // Поиск главного элемента
+        size_t maxRow = i;
+
+        for (size_t k = i + 1; k < N; k++) {
+            if (abs(a[k][i]) > abs(a[maxRow][i])) {
+                maxRow = k;
+            }
+        }
+
+        // Проверка на вырожденность матрицы
+        if (abs(a[maxRow][i]) < EPS) {
+            return false;
+        }
+
+        // Перестановка строк
+        for (size_t j = 0; j < N; j++) {
+            swap(a[i][j], a[maxRow][j]);
+        }
+
+        swap(b[i], b[maxRow]);
+
+        // Обнуление элементов ниже главного
+        for (size_t k = i + 1; k < N; k++) {
+
+            T factor = a[k][i] / a[i][i];
+
+            for (size_t j = i; j < N; j++) {
+                a[k][j] -= factor * a[i][j];
+            }
+
+            b[k] -= factor * b[i];
+        }
+    }
+
+    // Обратный ход метода Гаусса
+    for (int i = static_cast<int>(N) - 1; i >= 0; i--) {
+
+        T sum = b[i];
+
+        for (size_t j = i + 1; j < N; j++) {
+            sum -= a[i][j] * x[j];
+        }
+
+        if (abs(a[i][i]) < EPS) {
+            return false;
+        }
+
+        x[i] = sum / a[i][i];
+    }
+
+    LinearSystem<T, N>::incrementCounter();
+
+    return true;
+}
