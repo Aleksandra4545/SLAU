@@ -146,3 +146,38 @@ void scaleEquation(LinearSystem<T, N>& system,
     // Умножаем свободный член
     system.B[eqIndex] *= factor;
 }
+
+template <typename T, size_t N>
+void printSystem(const LinearSystem<T, N>& system) {
+
+    cout << "System of equations:\n";
+
+    for (size_t i = 0; i < N; i++) {
+
+        for (size_t j = 0; j < N; j++) {
+
+            cout << setw(9) << system.getA(i, j)
+                << " * x" << j + 1;
+            if (j < N - 1) { 
+                cout << " + ";
+
+            }
+        }
+
+        cout << " = " << system.getB(i) << '\n';
+    }
+}
+
+double determinant(double a[3][3]) {
+
+    return
+        a[0][0] * (a[1][1] * a[2][2] -
+                   a[1][2] * a[2][1])
+
+      - a[0][1] * (a[1][0] * a[2][2] -
+                   a[1][2] * a[2][0])
+
+      + a[0][2] * (a[1][0] * a[2][1] -
+                   a[1][1] * a[2][0]);
+}
+
